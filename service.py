@@ -199,4 +199,4 @@ if __name__ == '__main__':
     ov_client = OneViewClient.from_environment_variables()
     #ov_client = OneViewClient(config)
     #app.run(debug=True)
-    app.run()
+    app.run(host="0.0.0.0",debug=True)
