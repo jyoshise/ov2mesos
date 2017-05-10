@@ -124,7 +124,7 @@ def post_addnode():
         return_obj = dict(status=server[0]['taskStatus'],percentComplete=server[0]['percentComplete'],serverProfileUri=server[0]['associatedResource']['resourceUri'])
         return_list.append(return_obj)
 
-    return make_response(jsonify({'profileList': return_list,'requested':len(return_list), 'status':'build in progress'}))
+    return make_response(jsonify({'profileList': return_list,'requested':len(return_list), 'status':'Build in progress'}))
 
 @app.route('/ov2mesos/status', methods=['GET'])
 def get_profile_status():
@@ -166,7 +166,7 @@ def post_removenode():
     delete_list = []
     for profile in profile_list:
         delete_list.append(dict(name=profile['name'],uri=profile['uri'],hwuri=profile['serverHardwareUri']))
-    sorted_delete = sorted(delete_list, key=lambda k: k['name'])
+    sorted_delete = sorted(delete_list, key=lambda k: k['name'], reverse=True)
 
     deleted = []
 
@@ -184,7 +184,7 @@ def post_removenode():
             print(e.msg)
         deleted.append(sorted_delete[index]['name'])
 
-    return make_response(jsonify({'status':'Deleting','Requested':profile_count,'profiles':deleted}))
+    return make_response(jsonify({'status':'Deleting','requested':profile_count,'profiles':deleted}))
 
 
 if __name__ == '__main__':
