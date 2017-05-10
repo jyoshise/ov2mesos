@@ -27,6 +27,7 @@ from hpOneView.exceptions import HPOneViewException
 import os
 import datetime
 import json
+import sys
 
 app = Flask(__name__)
 ov_client = None
@@ -59,15 +60,8 @@ def get_capacity():
                 'model': server['model']
             }
             server_list.append(record)
-            # pre-empt capacity by shutting down servers.
-            '''
-            try:
-                ov_client.server_hardware.update_power_state(dict(powerState="Off",powerControl="MomentaryPress"),server['uri'],timeout=1)
-            except HPOneViewException as e:
-                print (e.msg)
-            '''
 
-    return make_response(jsonify({'available_count': len(server_list),'available': server_list}))
+    return make_response(jsonify({'available_count': len(server_list),'available': server_list, 'status':'complete'}))
 
 @app.route('/ov2mesos/addnode', methods=['POST'])
 def post_addnode():
@@ -130,7 +124,7 @@ def post_addnode():
         return_obj = dict(status=server[0]['taskStatus'],percentComplete=server[0]['percentComplete'],serverProfileUri=server[0]['associatedResource']['resourceUri'])
         return_list.append(return_obj)
 
-    return make_response(jsonify({'status': return_list,'requested':len(return_list)}))
+    return make_response(jsonify({'profileList': return_list,'requested':len(return_list), 'status':'build in progress'}))
 
 @app.route('/ov2mesos/status', methods=['GET'])
 def get_profile_status():
@@ -151,7 +145,7 @@ def get_profile_status():
             if task_status['stateReason'] == 'Completed':
                 server_profile_tasks.remove(server_profile)
 
-    return make_response(jsonify({'Message':'Count:0 implies all tasks are complete','Count':len(server_profile_tasks),'Profile status':status_list}))
+    return make_response(jsonify({'status':'complete','Message':'Count:0 implies all tasks are complete','Count':len(server_profile_tasks),'profile':status_list}))
 
 
 @app.route('/ov2mesos/removenode', methods=['POST'])
@@ -195,8 +189,6 @@ def post_removenode():
 
 if __name__ == '__main__':
     # Connect to OneView
-    print ("ov2mesos service started")
+    sys.stdout("\n\nhpe-oneview service started\n\n")
     ov_client = OneViewClient.from_environment_variables()
-    #ov_client = OneViewClient(config)
-    #app.run(debug=True)
     app.run(host="0.0.0.0",debug=True)
