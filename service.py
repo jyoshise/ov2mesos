@@ -107,7 +107,7 @@ def post_addnode():
             # Verify if Server_power is off before firing off a profile.
             task_uri = None
             try:
-                task_uri = ov_client.server_profiles.create(server_profile,timeout=2)
+                task_uri = ov_client.server_profiles.create(server_profile,timeout=6)
             except HPOneViewException as e:
                 print (e.msg)
 
@@ -137,7 +137,7 @@ def get_profile_status():
     if length >= 1:
         # process all tasks and return current status
         for server_profile in server_profile_tasks:
-            if server_profile[0]['uri'] is not None:
+            if server_profile[0] is not None:
                 task_status = ov_client.tasks.get(server_profile[0]['uri'])
                 status_dict = dict(status = task_status['taskStatus'],percentComplete=task_status['percentComplete'],
                                    serverProfileUri=task_status['associatedResource']['resourceUri'])
