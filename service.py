@@ -137,13 +137,14 @@ def get_profile_status():
     if length >= 1:
         # process all tasks and return current status
         for server_profile in server_profile_tasks:
-            task_status = ov_client.tasks.get(server_profile[0]['uri'])
-            status_dict = dict(status = task_status['taskStatus'],percentComplete=task_status['percentComplete'],
-                               serverProfileUri=task_status['associatedResource']['resourceUri'])
-            status_list.append(status_dict)
-            # remove completed tasks from list as its not relevant anymore
-            if task_status['stateReason'] == 'Completed':
-                server_profile_tasks.remove(server_profile)
+            if server_profile[0]['uri'] is not None:
+                task_status = ov_client.tasks.get(server_profile[0]['uri'])
+                status_dict = dict(status = task_status['taskStatus'],percentComplete=task_status['percentComplete'],
+                                   serverProfileUri=task_status['associatedResource']['resourceUri'])
+                status_list.append(status_dict)
+                # remove completed tasks from list as its not relevant anymore
+                if task_status['stateReason'] == 'Completed':
+                    server_profile_tasks.remove(server_profile)
 
     return make_response(jsonify({'status':'complete','Message':'Count:0 implies all tasks are complete','Count':len(server_profile_tasks),'profile':status_list}))
 
@@ -189,6 +190,6 @@ def post_removenode():
 
 if __name__ == '__main__':
     # Connect to OneView
-    sys.stdout("\n\nhpe-oneview service started\n\n")
+    print("\n\nhpe-oneview service started\n\n")
     ov_client = OneViewClient.from_environment_variables()
     app.run(host="0.0.0.0",debug=True)
