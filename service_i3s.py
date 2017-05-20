@@ -287,7 +287,7 @@ def post_removenode():
     delete_list = []
     for profile in profile_list:
         delete_list.append(dict(name=profile['name'],uri=profile['uri'],hwuri=profile['serverHardwareUri']))
-    sorted_delete = sorted(delete_list, key=lambda k: k['name'])
+    sorted_delete = sorted(delete_list, key=lambda k: k['name'],reverse=True)
 
     deleted = []
 
@@ -300,7 +300,7 @@ def post_removenode():
         except HPOneViewException as e:
             print(e.msg)
         try:
-            ov_client.server_profiles.delete(sorted_delete[index]['uri'])
+            ov_client.server_profiles.delete(sorted_delete[index]['uri'],timeout=10)
         except HPOneViewException as e:
             print(e.msg)
         deleted.append(sorted_delete[index]['name'])
