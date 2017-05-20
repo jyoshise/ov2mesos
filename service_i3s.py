@@ -266,7 +266,7 @@ def get_profile_status():
             if task_status['stateReason'] == 'Completed':
                 server_profile_tasks.remove(server_profile)
 
-    return make_response(jsonify({'Message':'Count:0 implies all tasks are complete','Count':len(server_profile_tasks),'Profile status':status_list}))
+    return make_response(jsonify({'Message':'Count:0 implies all tasks are complete','Count':len(server_profile_tasks),'profile':status_list}))
 
 
 @app.route('/ov2mesos/removenode', methods=['POST'])
