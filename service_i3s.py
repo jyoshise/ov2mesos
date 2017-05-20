@@ -228,7 +228,8 @@ def post_addnode():
             # Verify if Server_power is off before firing off a profile.
             task_uri = None
             try:
-                task_uri = ov_client.server_profiles.create(server_profile,timeout=10)
+                # Timing is everything
+                task_uri = ov_client.server_profiles.create(server_profile,timeout=14)
             except HPOneViewException as e:
                 print (e.msg)
 
@@ -242,8 +243,9 @@ def post_addnode():
 
     return_list = []
     for server in server_profile_tasks:
-        return_obj = dict(status=server[0]['taskStatus'],percentComplete=server[0]['percentComplete'],serverProfileUri=server[0]['associatedResource']['resourceUri'])
-        return_list.append(return_obj)
+        if server[0] is not None:
+            return_obj = dict(status=server[0]['taskStatus'],percentComplete=server[0]['percentComplete'],serverProfileUri=server[0]['associatedResource']['resourceUri'])
+            return_list.append(return_obj)
 
     return make_response(jsonify({'status': return_list,'requested':len(return_list)}))
 
@@ -258,13 +260,14 @@ def get_profile_status():
     if length >= 1:
         # process all tasks and return current status
         for server_profile in server_profile_tasks:
-            task_status = ov_client.tasks.get(server_profile[0]['uri'])
-            status_dict = dict(status = task_status['taskStatus'],percentComplete=task_status['percentComplete'],
-                               serverProfileUri=task_status['associatedResource']['resourceUri'])
-            status_list.append(status_dict)
-            # remove completed tasks from list as its not relevant anymore
-            if task_status['stateReason'] == 'Completed':
-                server_profile_tasks.remove(server_profile)
+            if server_profile[0] is not None:
+                task_status = ov_client.tasks.get(server_profile[0]['uri'])
+                status_dict = dict(status = task_status['taskStatus'],percentComplete=task_status['percentComplete'],
+                                   serverProfileUri=task_status['associatedResource']['resourceUri'])
+                status_list.append(status_dict)
+                # remove completed tasks from list as its not relevant anymore
+                if task_status['stateReason'] == 'Completed':
+                    server_profile_tasks.remove(server_profile)
 
     return make_response(jsonify({'Message':'Count:0 implies all tasks are complete','Count':len(server_profile_tasks),'profile':status_list}))
 
