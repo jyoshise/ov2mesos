@@ -271,6 +271,17 @@ def get_profile_status():
 
     return make_response(jsonify({'Message':'Count:0 implies all tasks are complete','Count':len(server_profile_tasks),'profile':status_list}))
 
+@app.route('/ov2mesos/poweron', methods=['POST'])
+def post_poweron():
+    # Power off the server if the server has not powered off
+    configuration = {
+        "powerState": "On",
+        "powerControl": "MomentaryPress"
+    }
+    server_power = ov_client.server_hardware.update_power_state(configuration,
+                                                                "/rest/server-hardware/36343537-3338-4448-3534-4E5030323930")
+    return make_response(jsonify({'status': 'Powering on...'}))
+
 
 @app.route('/ov2mesos/removenode', methods=['POST'])
 def post_removenode():
