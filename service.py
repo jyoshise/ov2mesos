@@ -147,7 +147,7 @@ def get_profile_status():
                     server_profile_tasks.remove(server_profile)
 
     with app.app_context():
-        return make_response(json.dump(dict(status='complete', Message='Count:0 implies all tasks are complete', Count=len(server_profile_tasks), profile=status_list)))
+        return make_response(json.dumps(dict(status='complete', Message='Count:0 implies all tasks are complete', Count=len(server_profile_tasks), profile=status_list)))
 
 
 @app.route('/ov2mesos/removenode', methods=['POST'])
